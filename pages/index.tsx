@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Header from '../components/Header'
 
 const Home: NextPage = () => {
   return (
@@ -7,7 +8,14 @@ const Home: NextPage = () => {
       <Head>
         <title>Facebook Clone</title>
       </Head>
-      <h1>Facebook Clone start</h1>
+
+      <Header />
+
+      <main>
+        {/* Sidebar */}
+        {/* Feed */}
+        {/* Widgets */}
+      </main>
     </div>
   )
 }
