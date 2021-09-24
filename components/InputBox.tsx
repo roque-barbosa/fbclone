@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/client';
 import { EmojiHappyIcon } from '@heroicons/react/outline';
@@ -6,19 +6,32 @@ import {
   CameraIcon,
   VideoCameraIcon
 } from '@heroicons/react/solid';
+import { db } from '../firebase';
+import * as firestore from "firebase/firestore"
+import * as firestorage from 'firebase/storage'
 
-//Functions --------------------------
-const sendPost = (event: any) => {
-  event.preventDefault();
-  console.log(event)
-}
-
-
-
-// Component -------------------------
 const InputBox:React.FC = () => {
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const [session, loading] = useSession();
+
+  const sendPost = async (event: any) => {
+    event.preventDefault();
+    
+    if (!inputRef.current?.value) return;
+    
+    const docRef = firestore.addDoc(
+      firestore.collection(db, 'posts'),
+      {
+        message: inputRef.current.value,
+        name: session?.user?.name,
+        email: session?.user?.email,
+        image: session?.user?.image,
+        timestamp: firestore.serverTimestamp(),
+      }
+    );
+    inputRef.current.value = "";
+  }
 
   return(
     <div className='
@@ -60,6 +73,7 @@ const InputBox:React.FC = () => {
             '
             type="text"
             placeholder={`what's on your mind, ${session!.user!.name!}?`}
+            ref={inputRef}
           />
           <button
             hidden

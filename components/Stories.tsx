@@ -44,6 +44,7 @@ const Stories:React.FC = () => {
     '>
       {stories.map(story => (
         <StoryCard
+        key={story.profile}
         name={story.name}
         src={story.src}
         profile={story.profile}
