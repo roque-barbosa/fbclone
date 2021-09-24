@@ -74,7 +74,7 @@ const Header: React.FC = () => {
           font-semibold
           pr-3
         '>
-          Roque Barbosa
+          {session?.user?.name}
         </p>
         <ViewGridIcon className='icon'/>
         <ChatIcon className='icon'/>
