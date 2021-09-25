@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/client';
 import { EmojiHappyIcon } from '@heroicons/react/outline';
@@ -6,14 +6,31 @@ import {
   CameraIcon,
   VideoCameraIcon
 } from '@heroicons/react/solid';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import * as firestore from "firebase/firestore"
 import * as firestorage from 'firebase/storage'
 
 const InputBox:React.FC = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const [session, loading] = useSession();
+  const filePickerRef = useRef<HTMLInputElement>(null);
+  const [session, _loading] = useSession();
+  const [imageToPost, setImageToPost] = useState(null);
+
+  const addImageToPost = (event: any) => {
+    const reader = new FileReader();
+    if (event.target.files[0]) {
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    reader.onload = ((reqderEvent: any) => {
+      setImageToPost(reqderEvent.target.result)
+    })
+  }
+
+  const removeImage = () => {
+    setImageToPost(null);
+  }
 
   const sendPost = async (event: any) => {
     event.preventDefault();
@@ -29,7 +46,31 @@ const InputBox:React.FC = () => {
         image: session?.user?.image,
         timestamp: firestore.serverTimestamp(),
       }
-    );
+    ).then( doc => {
+      if (imageToPost) {
+        const fireabseRef = firestorage.ref(storage, `posts/${doc.id}`)
+        const uploadTask = firestorage.uploadString(
+          fireabseRef,
+          imageToPost,
+          'data_url',
+        );
+
+        removeImage();
+
+        uploadTask
+        .then((uploadResult) => {
+          firestorage.getDownloadURL(fireabseRef)
+          .then(url => {
+            firestore.setDoc(
+              firestore.doc(db, `posts/${doc.id}`),
+              { postImage: url },
+              { merge: true },
+            );
+          })
+        })
+        .catch((err) => console.log(err.message))
+      }
+    });
     inputRef.current.value = "";
   }
 
@@ -80,9 +121,31 @@ const InputBox:React.FC = () => {
             type='submit'
             onClick={sendPost}
           >
-            
+            Submit
           </button>
         </form>
+
+        {imageToPost && (
+          <div onClick={removeImage} className='
+          flex
+          flex-col
+          hover:brightness-110
+          transition
+          duration-150
+          transform
+          hover:scale-105
+          cursor-pointer
+          '>
+            <img className='h-10 object-contain' src={imageToPost}/>
+            <p className='
+              text-xs
+              text-red-500
+              text-center
+            '>
+              Remove
+            </p>
+          </div>
+        )}
       </div>
 
       {/* BottomHalf */}
@@ -105,7 +168,7 @@ const InputBox:React.FC = () => {
             Live Video
           </p>
         </div>
-        <div className='inputIcon'>
+        <div onClick={() => filePickerRef.current?.click()} className='inputIcon'>
           <CameraIcon className='
             h-7
             text-green-400
@@ -117,6 +180,7 @@ const InputBox:React.FC = () => {
           '>
             Photo/Video
           </p>
+          <input ref={filePickerRef} onChange={addImageToPost} type='file' hidden/>
         </div>
         <div className='inputIcon'>
           <EmojiHappyIcon className='
