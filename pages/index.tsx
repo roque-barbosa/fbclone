@@ -2,10 +2,11 @@ import type { NextPage } from 'next'
 import { Session } from 'next-auth'
 import { getSession, GetSessionOptions } from 'next-auth/client'
 import Head from 'next/head'
-import Feed from '../components/Feed'
-import Header from '../components/Header'
-import Login from '../components/Login'
-import Sidebar from '../components/Sidebar'
+import Feed from '../components/Feed/Feed'
+import Header from '../components/Header/Header'
+import Login from '../components/Login/Login'
+import Sidebar from '../components/Sidebar/Sidebar'
+import Widgets from '../components/Widgets/Widgets'
 
 interface HomePageProps {
   session: Session|null
@@ -32,6 +33,7 @@ const Home: NextPage<HomePageProps> = ({session}) => {
         {/* Feed */}
         <Feed />
         {/* Widgets */}
+        <Widgets />
       </main>
     </div>
   )

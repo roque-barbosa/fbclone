@@ -6,7 +6,7 @@ import {
   CameraIcon,
   VideoCameraIcon
 } from '@heroicons/react/solid';
-import { db, storage } from '../firebase';
+import { db, storage } from '../../firebase';
 import * as firestore from "firebase/firestore"
 import * as firestorage from 'firebase/storage'
 
