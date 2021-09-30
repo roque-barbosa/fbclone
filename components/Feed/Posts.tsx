@@ -9,7 +9,7 @@ const Posts: React.FC = () => {
   const collectionRef  = collection(db, 'posts')
   const [posts, setPosts] = useState(Array());
 
-  const q = query(collectionRef, orderBy('timestamp'));
+  const q = query(collectionRef, orderBy('timestamp', 'desc'));
 
   onSnapshot(q, (querySnapshot) => {
     const newPosts: any[] = [];

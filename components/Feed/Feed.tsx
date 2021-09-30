@@ -11,8 +11,8 @@ const Feed:React.FC = () => {
     pb-44
     pt-6
     mr-4
-    xl:mr-14
     overflow-y-auto
+    scrollbar-hide
     '>
       {/* Sotires */}
       <Stories />

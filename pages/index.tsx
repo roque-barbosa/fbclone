@@ -7,6 +7,8 @@ import Header from '../components/Header/Header'
 import Login from '../components/Login/Login'
 import Sidebar from '../components/Sidebar/Sidebar'
 import Widgets from '../components/Widgets/Widgets'
+import { db } from '../firebase'
+import {collection, query, onSnapshot, orderBy, getDocs} from "firebase/firestore"
 
 interface HomePageProps {
   session: Session|null
@@ -41,9 +43,22 @@ const Home: NextPage<HomePageProps> = ({session}) => {
 export async function getServerSideProps(context: GetSessionOptions){
   // Get the user
   const session = await getSession(context);
+
+  const collectionRef  = collection(db, 'posts')
+  const q = query(collectionRef, orderBy('timestamp', 'desc'));
+
+  const posts = await getDocs(q)
+
+  const docs = posts.docs.map((post) => ({
+    id: post.id,
+    ...post.data,
+    timestamp: null
+  }));
+
   return {
     props: {
-      session
+      session,
+      posts: docs,
     }
   }
 }
